@@ -3,9 +3,7 @@ angular.module('babyTracker', [], function($routeProvider, $locationProvider) {
       when('/about', {templateUrl: 'partials/about.html'}).
       otherwise({redirectTo: '/', templateUrl: 'partials/login.html'});
 
-    $locationProvider.html5Mode(true);
+    // Remove the comment as soon as deployed to production,
+    // right now this is turned off so that local testing is easier
+    //$locationProvider.html5Mode(true);
 });
-
-function MainController($scope) {
-  $scope.override = 1;
-}
