@@ -2,7 +2,10 @@ require({
 	// configuration cgoes here
 
 	// we're configuring angularjs as a shim
-	shims: 'lib/angular': {exports: 'angular'}
+	shim: {
+		'lib/angular': {exports: 'angular'}
+	}
+
 }, [
 	// All our requirements
 	'app',
