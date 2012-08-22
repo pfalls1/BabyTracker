@@ -3,7 +3,7 @@ require({
 
 	// we're configuring angularjs as a shim
 	shim: {
-		'lib/angular': {exports: 'angular'}
+		'libs/angular': {exports: 'angular'}
 	}
 
 }, [

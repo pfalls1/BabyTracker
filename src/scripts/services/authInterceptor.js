@@ -1,5 +1,5 @@
 require([
-	'lib/angular'
+	'libs/angular'
 ], function(angular) {
 	'use strict'
 

@@ -3,7 +3,7 @@
 <head>
   <title>Baby Tracker</title>
 
-  <script data-main="/js/main.js" src="/js/lib/require.js"></script>
+  <script data-main="/scripts/main.js" src="/scripts/libs/require.js"></script>
 </head>
 <body ng-controller="MainController">
 

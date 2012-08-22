@@ -3,13 +3,18 @@ var fs = require('fs');
 var path = require('path');
  
 http.createServer(function (request, response) {
- 
+    dir = "/dist";
+
     console.log('request starting...');
-     
-    var filePath = '.' + request.url;
+    
+    var filePath = '.' + dir;
+    if (request.url == '/') {
+        filePath += '/index.html';
+    } else {
+        filePath += request.url;
+    }
+
     console.log(filePath);
-    if (filePath == './')
-        filePath = './index.html';
          
     var extname = path.extname(filePath);
     var contentType = 'text/html';
@@ -27,6 +32,7 @@ http.createServer(function (request, response) {
         if (exists) {
             console.log(exists);
             fs.readFile(filePath, function(error, content) {
+                
                 if (error) {
                     response.writeHead(500);
                     response.end();
@@ -44,6 +50,6 @@ http.createServer(function (request, response) {
         }
     });
      
-}).listen(8080);
+}).listen(8081);
  
-console.log('Server running at http://127.0.0.1:8080/');
+console.log('Server running at http://127.0.0.1:8081/');
