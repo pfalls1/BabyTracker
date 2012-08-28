@@ -107,6 +107,10 @@ module.exports = function (grunt) {
       template: {
         files: '<config:template.dev.src>',
         tasks: 'template:dev'
+      },
+      js: {
+        files: '<%= pkg.src %>scripts/**/*.js',
+        tasks: 'copy:scripts'
       }
     },
 

@@ -1,3 +1,9 @@
 .DS_Store
-dist/*
+dist
 node_modules/*
+logs
+project/project
+project/target
+target
+tmp
+.history
