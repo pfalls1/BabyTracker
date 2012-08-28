@@ -69,7 +69,7 @@ function restrict(req, res, next) {
   if (req.session.user) {
     next();
   } else {
-    res.send({message: "Access Denied"});
+    res.status(401).send({message: "Access Denied"});
   }
 }
 

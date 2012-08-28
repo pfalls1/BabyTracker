@@ -1,36 +1,61 @@
 require([
-	'libs/angular'
-], function(angular) {
+	'libs/angular',
+	'services/services'
+], function(angular, services) {
 	'use strict'
 
-	angular.module('babyTracker.services', []).
-		config(['$httpProvider', function($httpProvider) {
-			var interceptor = ['$rootScope', '$q', function($rootScope, $q) {
-				// for successful responses, we don't need to intercept anything, 
-				// so we'll just return the response as it.
-				function success(response) {
-					return response;
-				}
+	services.provider('authService', function() {
+		var previousRoute;
 
-				// On error, we need to check the response code.
-				// On 401 Unauthorized, we broadcast the "requireLogin" event
-				function error(response) {
-					var status = response.status;
-
-					if (status == 401) {
-						var deferred = $q.defer();
-						scope.$broadcast('event:loginRequired');
-	        			return deferred.promise;
+		this.$get = ['$location', function($location) {
+			return {
+				setPreviousRoute: function(route) {
+					previousRoute = route;
+				},
+				redirect: function(defaultPath) {
+					if (previousRoute) {
+						$location.path(previousRoute);
 					} else {
-						return $q.reject(response);
+						$location.path(defaultPath);
 					}
 				}
+			};
+		}];
+	}).
+	
+	config(['$httpProvider', function($httpProvider) {
+		var interceptor = ['$rootScope', '$q', '$location', 'authService', function($rootScope, $q, $location, authService) {
+			// for successful responses, we don't need to intercept anything, 
+			// so we'll just return the response as it.
+			function success(response) {
+				return response;
+			}
 
-				return function(promise) {
-					return promise.then(success, error);
+			// On error, we need to check the response code.
+			// On 401 Unauthorized, we broadcast the "requireLogin" event
+			function error(response) {
+				var status = response.status;
+
+				if (status == 401) {
+					var deferred = $q.defer();
+					console.log('redirecting...');
+					// save current route that we will go back to
+					authService.setPreviousRoute($location.path());
+
+					// redirect to the login page
+					$location.path('/login');
+
+        	return deferred.promise;
+				} else {
+					return $q.reject(response);
 				}
-			}];
+			}
 
-			$httpProvider.responseInterceptors.push(interceptor);
-		}]);
+			return function(promise) {
+				return promise.then(success, error);
+			}
+		}];
+
+		$httpProvider.responseInterceptors.push(interceptor);
+	}]);
 });

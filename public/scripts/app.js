@@ -1,6 +1,6 @@
 require([
 	'libs/angular',
-	'services/authInterceptor'
+	'services/services'
 ], function(angular) {
 	'use strict';
 
