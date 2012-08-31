@@ -3,6 +3,7 @@
  */
 
 var express = require('express'),
+    config = require('./config'),
     cluster = require('cluster'),
     http = require('http'),
     numCPUs = require('os').cpus().length,

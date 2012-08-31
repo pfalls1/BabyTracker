@@ -1,12 +1,27 @@
 var hash = require('../libs/pwd').hash,
-    db = require('../libs/db');
+    db = require('../libs/db'),
+    UserSchema = require('../models/user'),
+    User = db.model(UserSchema.name, UserSchema.schema);
 
 module.exports = function(api){
-  // dummy database
+  
+  // seed db
+  User.count({ name: 'tj' }, function (err, count) {
+    if (count == 0) {
+      var tj = new User({
+        name: "tj"
+      });
 
-  var users = {
-    tj: { name: 'tj' }
-  };
+      hash('foobar', function(err, salt, hash){
+        if (err) throw err;
+        // store the salt & hash in the "db"
+        tj.salt = salt;
+        tj.hash = hash;
+
+        tj.save();
+      });
+    }
+  });
 
   api.get('/logout', function(req, res){
     // destroy the user's session to log them out
@@ -46,29 +61,21 @@ module.exports = function(api){
    * Helper Methods
    */
 
-  // when you create a user, generate a salt
-  // and hash the password ('foobar' is the pass here)
-
-  hash('foobar', function(err, salt, hash){
-    if (err) throw err;
-    // store the salt & hash in the "db"
-    users.tj.salt = salt;
-    users.tj.hash = hash;
-  });
-
-
   // Authenticate using our plain-object database of doom!
   function authenticate(name, pass, fn) {
-    var user = users[name];
-    // query the db for the given username
-    if (!user) return fn(new Error('cannot find user'));
-    // apply the same algorithm to the POSTed password, applying
-    // the hash against the pass / salt, if there is a match we
-    // found the user
-    hash(pass, user.salt, function(err, hash){
-      if (err) return fn(err);
-      if (hash == user.hash) return fn(null, user);
-      fn(new Error('invalid password'));
-    })
+    User.findOne({ 'name' : name }, function(err, user) {
+      if (err || !user) {
+        return fn(new Error('cannot find user'));
+      } else {
+        // apply the same algorithm to the POSTed password, applying
+        // the hash against the pass / salt, if there is a match we
+        // found the user
+        hash(pass, user.salt, function(err, hash){
+          if (err) return fn(err);
+          if (hash == user.hash) return fn(null, user);
+          fn(new Error('invalid password'));
+        })
+      }
+    });
   }
 }
