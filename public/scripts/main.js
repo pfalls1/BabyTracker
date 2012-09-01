@@ -12,6 +12,8 @@ require({
 	'controllers/applicationController',
 	'controllers/loginController',
 	'controllers/secureController',
+	'controllers/registrationController',
+	'controllers/userListController',
 	'services/services',
 	'services/authInterceptor'
 ], function(app) {

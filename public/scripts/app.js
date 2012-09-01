@@ -14,6 +14,12 @@ require([
 			when('/login', {
 				templateUrl: 'scripts/partials/login.html'
 			}).
+			when('/register', {
+				templateUrl: 'scripts/partials/register.html'
+			}).
+			when('/users', {
+				templateUrl: 'scripts/partials/userList.html'
+			}).
 			when('/secure', {
 				templateUrl: 'scripts/partials/secure.html'
 			}).
