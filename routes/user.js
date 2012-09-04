@@ -1,4 +1,5 @@
 var hash = require('../libs/pwd').hash,
+    auth = require('../libs/authenticate'),
     db = require('../libs/db'),
     UserSchema = require('../models/user'),
     User = db.model(UserSchema.name, UserSchema.schema);
