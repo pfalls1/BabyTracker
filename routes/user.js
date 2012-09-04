@@ -22,6 +22,8 @@ module.exports = function(api){
       if(err) {
         res.send(500);
       } else {
+        // TODO: limit fields being sent back, not great to send back
+        // hash or salt!
         res.send({
           status: "success",
           users: users
@@ -32,15 +34,8 @@ module.exports = function(api){
 
   // GET /user/:id
   // Returns the specific user defined by the :id
-  api.get('/user/:id', function(req, res) {
-    // TODO: Discover if i should use _id or __v
-    User.findOne({ _id: req.params.id}, function(err, user) {
-      if(err || !user) {
-        res.send(500);
-      } else {
-        res.send(user);
-      }
-    });
+  api.get('/user/:id', loadUser, function(req, res) {
+    res.send(req.user);
   });
 
   // POST /user
@@ -49,7 +44,6 @@ module.exports = function(api){
   //  name: string
   //  password: string
   api.post('/user', function(req, res) {
-    console.log(req.body.username);
     // TODO: validations
     var user = new User({
       name: req.body.username
@@ -93,49 +87,52 @@ module.exports = function(api){
   // Available params:
   //  name: string
   //  password: string
-  api.put('/user/:id', function(req, res) {
-    User.findOne({ _id: req.params.id }, function(err, user) {
-      if(err || !user) {
-        res.send(500);
-      } else {
-        // TODO: check to see if req.body.name was actually sent
-        user.name = req.body.name;
+  api.put('/user/:id', loadUser, function(req, res) {
+    // TODO: check to see if req.body.name was actually sent
+    req.user.name = req.body.name;
 
-        hash(req.body.password, function(err, salt, hash){
-          // TODO: Send back an actual error response
-          if (err) throw err;
-          // store the salt & hash in the "db"
-          user.salt = salt;
-          user.hash = hash;
+    hash(req.body.password, function(err, salt, hash){
+      // TODO: Send back an actual error response
+      if (err) throw err;
+      // store the salt & hash in the "db"
+      req.user.salt = salt;
+      req.user.hash = hash;
 
-          user.save(function(err, user) {
-            if(err) {
-              // TODO: send better error messages
-              res.send(500);
-            } else {
-              res.send({status: "success"});
-            }
-          });
-        });
-      }
+      req.user.save(function(err, user) {
+        if(err) {
+          // TODO: send better error messages
+          res.send(500);
+        } else {
+          res.send({status: "success"});
+        }
+      });
     });
   });
 
   // DELETE /user/:id
   // Deletes this user. This will truely delete them from the system
-  api.delete('/user/:id', function(req, res) {
-    User.findOne({ _id: req.params.id }, function(err, user) {
-      if(err || !user) {
+  api.delete('/user/:id', loadUser, function(req, res) {
+    req.user.remove(function(err, user) {
+      if(err) {
         res.send(500);
       } else {
-        user.remove(function(err, user) {
-          if(err) {
-            res.send(500);
-          } else {
-            res.send({status: "success"});
-          }
-        });
+        res.send({status: "success"});
       }
     });
   });
+
+  /**
+   * Middleware
+   */
+  function loadUser(req, res, next) {
+    User.findOne({ _id: req.params.id }, function(err, user) {
+      if(err || !user) {
+        // TODO: send a better response
+        res.send(500);
+      } else {
+        req.user = user;
+        next();
+      }
+    });
+  }
 };

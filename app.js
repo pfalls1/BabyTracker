@@ -38,6 +38,9 @@ api.get('/restricted', restrict, function(req, res){
   res.send({payload: "You've reached a restricted area!"});
 });
 
+// TODO add api.all("*", loadCurrentUser) which will get the currently logged in user
+// We want the separate from the authentication middleware just in case
+
 /**
  * Configure Cluster
  */
