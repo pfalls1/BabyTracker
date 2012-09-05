@@ -9,9 +9,6 @@ var hash = require('../libs/pwd').hash,
  *
  * All CRUD routes specific to users.
  *
- * TODO: Some of these routes need some authentication middleware to prevent
- * other users from accessing them, for example, /user/:id should only be 
- * accessible by that user
  */
 module.exports = function(api){
   
@@ -50,16 +47,12 @@ module.exports = function(api){
       name: req.body.username
     });
 
-    console.log(user);
-
     hash(req.body.password, function(err, salt, hash){
       // TODO: Send back an actual error response
       if (err) throw err;
       // store the salt & hash in the "db"
       user.salt = salt;
       user.hash = hash;
-
-      console.log(user);
 
       user.save(function(err, user) {
         if(err) {
@@ -88,7 +81,7 @@ module.exports = function(api){
   // Available params:
   //  name: string
   //  password: string
-  api.put('/user/:id', loadUser, function(req, res) {
+  api.put('/user/:id', auth.requireAuth, loadUser, canEditUser, function(req, res) {
     // TODO: check to see if req.body.name was actually sent
     req.user.name = req.body.name;
 
@@ -112,7 +105,7 @@ module.exports = function(api){
 
   // DELETE /user/:id
   // Deletes this user. This will truely delete them from the system
-  api.delete('/user/:id', loadUser, function(req, res) {
+  api.delete('/user/:id', auth.requireAuth, loadUser, canEditUser, function(req, res) {
     req.user.remove(function(err, user) {
       if(err) {
         res.send(500);
@@ -135,5 +128,18 @@ module.exports = function(api){
         next();
       }
     });
+  }
+
+  /**
+   * Function that ensures that the current user can view the requested user.
+   * For our example, users can only view themselves.
+   */
+  function canEditUser(req, res, next) {
+    if(!req.currentUser || req.current_user._id != req.user._id) {
+      // the current user is trying to access the information of another user
+      res.send(401);
+    } else {
+      next();
+    }
   }
 };

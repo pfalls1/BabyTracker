@@ -3,43 +3,33 @@ var hash = require('../libs/pwd').hash,
     UserSchema = require('../models/user'),
     User = db.model(UserSchema.name, UserSchema.schema);
 
-module.exports = function(api){
-  
-  // seed db
-  User.count({ name: 'tj' }, function (err, count) {
-    if (count == 0) {
-      var tj = new User({
-        name: "tj"
-      });
+/**
+ * Session Routes
+ *
+ * These are routes that deal with the session. Typically this refers to 
+ * logging in and logging out.
+ */
+module.exports = function(api) {
 
-      hash('foobar', function(err, salt, hash){
-        if (err) throw err;
-        // store the salt & hash in the "db"
-        tj.salt = salt;
-        tj.hash = hash;
-
-        tj.save();
-      });
-    }
-  });
-
-  api.get('/logout', function(req, res){
+  // POST /logout
+  // Log out the curently logged in user. This will destroy their session
+  api.post('/logout', function(req, res) {
     // destroy the user's session to log them out
     // will be re-created next request
-    req.session.destroy(function(){
-      res.redirect('/');
+    req.session.destroy(function() {
+      // TOOD: Should I send a message back here, and if so, should I have some sort of messaging module that handles this for me
+      // perhaps with localization
+      res.send(200, { message: "Logged Out" });
     });
   });
 
-  api.get('/login', function(req, res){
-    if (req.session.user) {
-      res.send({message: "You are logged in!"});
-    } else {
-      res.send({message: "You are not logged in."});
-    }
-  });
-
+  // POST /login
+  // Attempts to login the user with the supplied credentials.
+  // Expected params:
+  //  username
+  //  password
   api.post('/login', function(req, res){
+    // TODO move this to the authenticate module
     authenticate(req.body.username, req.body.password, function(err, user){
       if (user) {
         // Regenerate session when signing in
@@ -49,9 +39,11 @@ module.exports = function(api){
           // in the session store to be retrieved,
           // or in this case the entire user object
           req.session.user = user;
+          // TODO come up with a uniform response object
           res.send({status: "success"});
         });
       } else {
+        // TODO send correct http status
         res.send({status: "error"});
       }
     });
