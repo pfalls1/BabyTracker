@@ -18,7 +18,7 @@ module.exports = function(api){
   // GET /users
   // Returns the full list of users in the 
   // system
-  api.get('/users', function(req, res) {
+  api.get('/users', auth.requireAuth, function(req, res) {
     User.find({}, function(err, users) {
       if(err) {
         res.send(500);

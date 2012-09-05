@@ -4,7 +4,7 @@ function UserListController($scope, $http) {
   $scope.users = [];
 
   // retrieve the list of users
-  $http.get('http://localhost:3001/users').
+  $http.get('http://localhost:3001/users', { withCredentials: true }).
     success(function(data, status, headers, config) {
       $scope.users = data.users;
     }).
