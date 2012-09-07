@@ -14,11 +14,15 @@ if (cluster.isMaster) {
     cluster.fork();
   }
 } else {
-  var express = require('express'),
-      config  = require('./config'),
-      api     = express(),
-      db      = require('./libs/db')(config); 
+  var express  = require('express'),
+      config   = require('./config'),
+      api      = express(),
+      mongoose = require('mongoose'),
+      db       = require('./libs/db')(mongoose, config); 
 
+  // intialize models
+  require('./models')(mongoose);
+  
   // set configuration on the app
   // using api.set in this case, ma not be the right choice
   api.set('config', config);

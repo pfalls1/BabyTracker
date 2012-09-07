@@ -8,13 +8,15 @@ var hash = require('../libs/pwd').hash,
  *
  */
 module.exports = function(api) {
-  var User = require('../models/user')(api.get('db'));
+  var User = api.get('db').model('User');
 
   // GET /users
   // Returns the full list of users in the 
   // system
   api.get('/users', function(req, res) {
+    console.log('serving /users');
     User.find({}, function(err, users) {
+      console.log('found users');
       if(err) {
         res.send(500);
       } else {

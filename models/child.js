@@ -1,11 +1,9 @@
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+module.exports = function(mongoose) {
+  var Schema = mongoose.Schema,
+      Child = new Schema({
+        name   : String,
+        parent : [{ type: Schema.ObjectId, ref: 'User' }]
+      });
 
-module.exports = function(db) {
-  var Child = new Schema({
-    name   : String,
-    parent : [{ type: Schema.Type.ObjectId, ref: 'User' }]
-  });
-
-  return db.model('Child', Child);
+  return mongoose.model('Child', Child);
 };
