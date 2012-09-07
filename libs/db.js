@@ -1,5 +1,6 @@
-var mongoose = require('mongoose'),
-    config = require('../config'),
-    db = mongoose.createConnection(config.db.url, config.db.database);
+var mongoose = require('mongoose');
 
-module.exports = db;
+// config refers to the normal config file for babyTracker
+module.exports = function(config) {
+  return mongoose.createConnection(config.db.url, config.db.database);
+};

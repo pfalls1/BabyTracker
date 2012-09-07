@@ -1,12 +1,13 @@
 var mongoose = require('mongoose'),
-    Schema = mongoose.Schema,
-    ObjectId = Schema.ObjectId;
+    Schema   = mongoose.Schema;
 
-var User = new Schema({
-  name : { type: String },
-  salt : { type: String },
-  hash : { type: String }
-});
+module.exports = function(db) {
+  var User = new Schema({
+    name     : String,
+    salt     : String,
+    hash     : String,
+    children : [{ type: Schema.Types.ObjectId, ref: 'Child'}] 
+  });
 
-exports.schema = User;
-exports.name = 'User';
+  return db.model('User', User);
+};

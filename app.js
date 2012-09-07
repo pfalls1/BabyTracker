@@ -2,12 +2,8 @@
  * Module dependencies.
  */
 
-var express = require('express'),
-    config  = require('./config'),
-    cluster = require('cluster'),
-    http    = require('http'),
-    numCPUs = require('os').cpus().length,
-    api     = express();
+var cluster = require('cluster'),
+    numCPUs = require('os').cpus().length;
 
 /**
  * Configure Cluster
@@ -18,21 +14,28 @@ if (cluster.isMaster) {
     cluster.fork();
   }
 } else {
+  var express = require('express'),
+      config  = require('./config'),
+      api     = express(),
+      db      = require('./libs/db')(config); 
+
   // set configuration on the app
-  api.config = config;
+  // using api.set in this case, ma not be the right choice
+  api.set('config', config);
+  api.set('db', db);
 
   // API middleware
   // TODO: better secret key for cookie parser
   api.use(express.cookieParser('shhhh, very secret'));
   api.use(express.session());
   api.use(express.bodyParser());
-  if(api.config.logger.use) {
-    api.use(express.logger(api.config.logger.level));
+  if(config.logger.use) {
+    api.use(express.logger(config.logger.level));
   }
 
   // Load the routes
   require('./routes')(api);
 
   // start listening
-  api.listen(api.config.port);
+  api.listen(config.port);
 }

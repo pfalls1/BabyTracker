@@ -1,7 +1,4 @@
-var hash = require('../libs/pwd').hash,
-    db = require('../libs/db'),
-    UserSchema = require('../models/user'),
-    User = db.model(UserSchema.name, UserSchema.schema);
+var hash = require('../libs/pwd').hash;
 
 /**
  * Session Routes
@@ -10,6 +7,7 @@ var hash = require('../libs/pwd').hash,
  * logging in and logging out.
  */
 module.exports = function(api) {
+  var User = require('../models/user')(api.get('db'));
 
   // POST /logout
   // Log out the curently logged in user. This will destroy their session

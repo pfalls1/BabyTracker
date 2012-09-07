@@ -1,5 +1,5 @@
 var config = {
-  port: 3000,
+  port: 3001,
   originURL: 'http://localhost:3000',
   db: {
     url: 'localhost',

@@ -1,8 +1,5 @@
 var hash = require('../libs/pwd').hash,
-    auth = require('../libs/authenticate'),
-    db = require('../libs/db'),
-    UserSchema = require('../models/user'),
-    User = db.model(UserSchema.name, UserSchema.schema);
+    auth = require('../libs/authenticate');
 
 /**
  * User routes
@@ -10,8 +7,9 @@ var hash = require('../libs/pwd').hash,
  * All CRUD routes specific to users.
  *
  */
-module.exports = function(api){
-  
+module.exports = function(api) {
+  var User = require('../models/user')(api.get('db'));
+
   // GET /users
   // Returns the full list of users in the 
   // system
